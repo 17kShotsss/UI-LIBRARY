@@ -28,7 +28,7 @@ Library.Themes = {
         MainText = Color3.fromRGB(230, 230, 240),
         MainMuted = Color3.fromRGB(150, 150, 160),
         Separator = Color3.fromRGB(40, 50, 60),
-        Font = Enum.Font.Inter,
+        Font = Enum.Font.Gotham,
         CornerRadius = UDim.new(0, 8),
         TransitionTime = 0.15,
     },
@@ -44,7 +44,7 @@ Library.Themes = {
         MainText = Color3.fromRGB(230, 230, 240),
         MainMuted = Color3.fromRGB(150, 150, 160),
         Separator = Color3.fromRGB(40, 50, 60),
-        Font = Enum.Font.Inter,
+        Font = Enum.Font.Gotham,
         CornerRadius = UDim.new(0, 8),
         TransitionTime = 0.15,
     },
@@ -60,7 +60,7 @@ Library.Themes = {
         MainText = Color3.fromRGB(230, 230, 240),
         MainMuted = Color3.fromRGB(150, 150, 160),
         Separator = Color3.fromRGB(40, 50, 60),
-        Font = Enum.Font.Inter,
+        Font = Enum.Font.Gotham,
         CornerRadius = UDim.new(0, 8),
         TransitionTime = 0.15,
     },
@@ -469,7 +469,7 @@ end
 --[[ example: Full UI Demo ]]--
 ------------------------
 --[[
-local lib = require(path.to.thisfile)
+local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/17kShotsss/UI-LIBRARY/refs/heads/main/main.lua"))()
 
 -- Build the window
 lib:BuildWindow()
