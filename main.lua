@@ -73,8 +73,8 @@ Library.Config = {
     SelectedCategory = 1,
     SelectedTab = 1,
     Saved = {},
-    WindowPos = UDim2.new(0.5, -300, 0.5, -200),
-    WindowSize = UDim2.new(0, 600, 0, 400),
+    WindowPos = UDim2.new(0.5, -450, 0.5, -300),
+    WindowSize = UDim2.new(0, 900, 0, 600),
     Visible = true,
 }
 function Library:SetTheme(themeName)
@@ -153,20 +153,7 @@ Library._Sidebar = nil
 Library._MainContent = nil
 Library._CategoryButtons = {}
 Library._TabButtons = {}
-Library._Categories = {
-    {
-        Name = "main",
-        Tabs = {"ragebot", "legitbot"},
-    },
-    {
-        Name = "visuals",
-        Tabs = {"players", "general", "skins"},
-    },
-    {
-        Name = "misc.",
-        Tabs = {"players", "configs", "addons", "shop", "main"},
-    },
-}
+Library._Categories = {} -- Start with no categories/tabs by default
 function Library:BuildWindow()
     if Library._SidebarGui then Library._SidebarGui:Destroy() end
     local theme = Library.Themes[Library.Config.Theme]
