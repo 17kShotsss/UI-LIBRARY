@@ -28,7 +28,7 @@ Library.Themes = {
         MainText = Color3.fromRGB(230, 230, 240),
         MainMuted = Color3.fromRGB(150, 150, 160),
         Separator = Color3.fromRGB(40, 50, 60),
-        Font = Enum.Font.Gotham,
+        Font = Enum.Font.Inter,
         CornerRadius = UDim.new(0, 8),
         TransitionTime = 0.15,
     },
@@ -44,7 +44,7 @@ Library.Themes = {
         MainText = Color3.fromRGB(230, 230, 240),
         MainMuted = Color3.fromRGB(150, 150, 160),
         Separator = Color3.fromRGB(40, 50, 60),
-        Font = Enum.Font.Gotham,
+        Font = Enum.Font.Inter,
         CornerRadius = UDim.new(0, 8),
         TransitionTime = 0.15,
     },
@@ -60,7 +60,7 @@ Library.Themes = {
         MainText = Color3.fromRGB(230, 230, 240),
         MainMuted = Color3.fromRGB(150, 150, 160),
         Separator = Color3.fromRGB(40, 50, 60),
-        Font = Enum.Font.Gotham,
+        Font = Enum.Font.Inter,
         CornerRadius = UDim.new(0, 8),
         TransitionTime = 0.15,
     },
@@ -298,8 +298,22 @@ function Library:BuildWindow()
     main.Parent = window
     Library._MainContent = main
     AddCorner(main, theme.CornerRadius)
-    -- Show selected tab content
-    Library:ShowTabContent(Library.Config.SelectedCategory, Library.Config.SelectedTab)
+    -- Show selected tab content only if exists
+    if #Library._Categories > 0 and Library._Categories[Library.Config.SelectedCategory] and Library._Categories[Library.Config.SelectedCategory].Tabs and #Library._Categories[Library.Config.SelectedCategory].Tabs > 0 then
+        Library:ShowTabContent(Library.Config.SelectedCategory, Library.Config.SelectedTab)
+    else
+        main:ClearAllChildren()
+        local label = Instance.new("TextLabel")
+        label.Text = "No categories/tabs defined."
+        label.Font = theme.Font
+        label.TextColor3 = theme.MainMuted
+        label.TextSize = 22
+        label.BackgroundTransparency = 1
+        label.Position = UDim2.new(0.5, -120, 0.5, -16)
+        label.Size = UDim2.new(0, 240, 0, 32)
+        label.TextXAlignment = Enum.TextXAlignment.Center
+        label.Parent = main
+    end
     -- Theme update hooks
     Library._UpdateTheme = function()
         local theme = Library.Themes[Library.Config.Theme]
@@ -352,6 +366,19 @@ function Library:ShowTabContent(catIdx, tabIdx)
     if not main then return end
     main:ClearAllChildren()
     local theme = Library.Themes[Library.Config.Theme]
+    if not Library._Categories[catIdx] or not Library._Categories[catIdx].Tabs or not Library._Categories[catIdx].Tabs[tabIdx] then
+        local label = Instance.new("TextLabel")
+        label.Text = "No categories/tabs defined."
+        label.Font = theme.Font
+        label.TextColor3 = theme.MainMuted
+        label.TextSize = 22
+        label.BackgroundTransparency = 1
+        label.Position = UDim2.new(0.5, -120, 0.5, -16)
+        label.Size = UDim2.new(0, 240, 0, 32)
+        label.TextXAlignment = Enum.TextXAlignment.Center
+        label.Parent = main
+        return
+    end
     local label = Instance.new("TextLabel")
     label.Text = "["..Library._Categories[catIdx].Name.."] "..Library._Categories[catIdx].Tabs[tabIdx]
     label.Font = theme.Font
