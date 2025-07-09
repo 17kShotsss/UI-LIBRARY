@@ -73,8 +73,8 @@ Library.Config = {
     SelectedCategory = 1,
     SelectedTab = 1,
     Saved = {},
-    WindowPos = UDim2.new(0.5, -450, 0.5, -300),
-    WindowSize = UDim2.new(0, 900, 0, 600),
+    WindowPos = UDim2.new(0.5, -1350, 0.5, -900),
+    WindowSize = UDim2.new(0, 2700, 0, 1800),
     Visible = true,
 }
 function Library:SetTheme(themeName)
