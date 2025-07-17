@@ -1,4 +1,3 @@
-
 local InputService = game:GetService('UserInputService');
 local TextService = game:GetService('TextService');
 local TweenService = game:GetService('TweenService');
@@ -132,14 +131,11 @@ function Library:AddToolTip(InfoStr, HoverInstance)
     local Tooltip = Library:Create('Frame', {
         BackgroundColor3 = Library.MainColor,        
         BorderColor3 = Library.OutlineColor,
-
         Size = UDim2.fromOffset(X + 5, Y + 4),
         ZIndex = 100,
         Parent = Library.ScreenGui,
-
         Visible = false,
     })
-
     local Label = Library:CreateLabel({
         Position = UDim2.fromOffset(3, 1),
         Size = UDim2.fromOffset(X, Y);
@@ -148,35 +144,30 @@ function Library:AddToolTip(InfoStr, HoverInstance)
         TextColor3 = Library.FontColor,
         TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = Tooltip.ZIndex + 1,
-
         Parent = Tooltip;
     });
-
     Library:AddToRegistry(Tooltip, {
         BackgroundColor3 = 'MainColor';
         BorderColor3 = 'OutlineColor';
     });
-
     Library:AddToRegistry(Label, {
         TextColor3 = 'FontColor',
     });
-    
     local IsHovering = false
+    local heartbeatConn
     HoverInstance.MouseEnter:Connect(function()
         IsHovering = true
-        
         Tooltip.Position = UDim2.fromOffset(Mouse.X + 15, Mouse.Y + 12)
         Tooltip.Visible = true
-
-        while IsHovering do
-            RunService.Heartbeat:Wait()
+        heartbeatConn = RunService.Heartbeat:Connect(function()
+            if not IsHovering then return end
             Tooltip.Position = UDim2.fromOffset(Mouse.X + 15, Mouse.Y + 12)
-        end
+        end)
     end)
-
     HoverInstance.MouseLeave:Connect(function()
         IsHovering = false
         Tooltip.Visible = false
+        if heartbeatConn then heartbeatConn:Disconnect() heartbeatConn = nil end
     end)
 end
 
@@ -280,22 +271,16 @@ function Library:RemoveFromRegistry(Instance)
 end;
 
 function Library:UpdateColorsUsingRegistry()
-    -- TODO: Could have an 'active' list of objects
-    -- where the active list only contains Visible objects.
-
-    -- IMPL: Could setup .Changed events on the AddToRegistry function
-    -- that listens for the 'Visible' propert being changed.
-    -- Visible: true => Add to active list, and call UpdateColors function
-    -- Visible: false => Remove from active list.
-
-    -- The above would be especially efficient for a rainbow menu color or live color-changing.
-
     for Idx, Object in next, Library.Registry do
         for Property, ColorIdx in next, Object.Properties do
+            local newValue
             if type(ColorIdx) == 'string' then
-                Object.Instance[Property] = Library[ColorIdx];
+                newValue = Library[ColorIdx]
             elseif type(ColorIdx) == 'function' then
-                Object.Instance[Property] = ColorIdx()
+                newValue = ColorIdx()
+            end
+            if Object.Instance[Property] ~= newValue then
+                Object.Instance[Property] = newValue
             end
         end;
     end;
@@ -555,20 +540,21 @@ do
         end)
 
         function ColorPicker:Display()
-            ColorPicker.Value = Color3.fromHSV(ColorPicker.Hue, ColorPicker.Sat, ColorPicker.Vib);
-            SatVibMap.BackgroundColor3 = Color3.fromHSV(ColorPicker.Hue, 1, 1);
-
-            Library:Create(DisplayFrame, {
-                BackgroundColor3 = ColorPicker.Value;
-                BorderColor3 = Library:GetDarkerColor(ColorPicker.Value);
-            });
-
-            HueBox.Text = '#' .. ColorPicker.Value:ToHex()
-            RgbBox.Text = table.concat({ math.floor(ColorPicker.Value.R * 255), math.floor(ColorPicker.Value.G * 255), math.floor(ColorPicker.Value.B * 255) }, ', ')
-
-            if ColorPicker.Changed then
-                ColorPicker.Changed(ColorPicker.Value)
-            end;
+            local oldValue = ColorPicker.Value
+            local newValue = Color3.fromHSV(ColorPicker.Hue, ColorPicker.Sat, ColorPicker.Vib)
+            if oldValue ~= newValue then
+                ColorPicker.Value = newValue
+                SatVibMap.BackgroundColor3 = Color3.fromHSV(ColorPicker.Hue, 1, 1)
+                Library:Create(DisplayFrame, {
+                    BackgroundColor3 = ColorPicker.Value;
+                    BorderColor3 = Library:GetDarkerColor(ColorPicker.Value);
+                });
+                HueBox.Text = '#' .. ColorPicker.Value:ToHex()
+                RgbBox.Text = table.concat({ math.floor(ColorPicker.Value.R * 255), math.floor(ColorPicker.Value.G * 255), math.floor(ColorPicker.Value.B * 255) }, ', ')
+                if ColorPicker.Changed then
+                    ColorPicker.Changed(ColorPicker.Value)
+                end;
+            end
         end;
 
         function ColorPicker:OnChanged(Func)
@@ -1330,12 +1316,13 @@ do
                 end
             end
 
-            Textbox.Value = Text;
-            Box.Text = Text;
-                
-            if Textbox.Changed then
-                Textbox.Changed(Textbox.Value)
-            end;
+            if Textbox.Value ~= Text then
+                Textbox.Value = Text;
+                Box.Text = Text;
+                if Textbox.Changed then
+                    Textbox.Changed(Textbox.Value)
+                end;
+            end
         end;
 
         if Textbox.Finished then
@@ -1671,19 +1658,17 @@ do
 
         function Slider:SetValue(Str)
             local Num = tonumber(Str);
-
             if (not Num) then
                 return;
             end;
-
             Num = math.clamp(Num, Slider.Min, Slider.Max);
-
-            Slider.Value = Num;
-            Slider:Display();
-
-            if Slider.Changed then
-                Slider.Changed(Slider.Value)
-            end;
+            if Slider.Value ~= Num then
+                Slider.Value = Num;
+                Slider:Display();
+                if Slider.Changed then
+                    Slider.Changed(Slider.Value)
+                end;
+            end
         end;
 
         SliderInner.InputBegan:Connect(function(Input)
@@ -2570,22 +2555,34 @@ function Library:CreateWindow(...)
             Parent = TabContainer;
         });
 
-        local LeftSide = Library:Create('Frame', {
+        -- Replace LeftSide and RightSide Frames with ScrollingFrames for scrollability
+        local LeftSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1;
             Position = UDim2.new(0, 8, 0, 8);
             Size = UDim2.new(0.5, -12, 0, 507);
             ZIndex = 2;
             Parent = TabFrame;
+            CanvasSize = UDim2.new(0, 0, 0, 0);
+            ScrollBarThickness = 0; -- Hide scrollbar
+            VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar;
+            BorderSizePixel = 0;
+            AutomaticCanvasSize = Enum.AutomaticSize.Y;
         });
 
-        local RightSide = Library:Create('Frame', {
+        local RightSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1;
             Position = UDim2.new(0.5, 4, 0, 8);
             Size = UDim2.new(0.5, -12, 0, 507);
             ZIndex = 2;
             Parent = TabFrame;
+            CanvasSize = UDim2.new(0, 0, 0, 0);
+            ScrollBarThickness = 0; -- Hide scrollbar
+            VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar;
+            BorderSizePixel = 0;
+            AutomaticCanvasSize = Enum.AutomaticSize.Y;
         });
 
+        -- Move UIListLayout into the ScrollingFrames
         Library:Create('UIListLayout', {
             Padding = UDim.new(0, 8);
             FillDirection = Enum.FillDirection.Vertical;
