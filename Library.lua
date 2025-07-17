@@ -159,6 +159,7 @@ function Library:AddToolTip(InfoStr, HoverInstance)
         IsHovering = true
         Tooltip.Position = UDim2.fromOffset(Mouse.X + 15, Mouse.Y + 12)
         Tooltip.Visible = true
+        if heartbeatConn then heartbeatConn:Disconnect() heartbeatConn = nil end -- Ensure only one connection
         heartbeatConn = RunService.Heartbeat:Connect(function()
             if not IsHovering then return end
             Tooltip.Position = UDim2.fromOffset(Mouse.X + 15, Mouse.Y + 12)
@@ -2433,10 +2434,11 @@ function Library:CreateWindow(...)
     });
 
     local WindowLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 7, 0, 0);
+        Position = UDim2.new(0.5, 0, 0, 0), -- Center horizontally
+        AnchorPoint = Vector2.new(0.5, 0),  -- Center anchor
         Size = UDim2.new(0, 0, 0, 25);
         Text = Config.Title or '';
-        TextXAlignment = Enum.TextXAlignment.Left;
+        TextXAlignment = Enum.TextXAlignment.Center; -- Center text
         ZIndex = 1;
         Parent = Inner;
     });
