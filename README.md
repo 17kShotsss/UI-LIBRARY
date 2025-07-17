@@ -1,177 +1,121 @@
-# 💻 Roblox Executor UI Library (Linoria-Based)
+# Linoria-Based UI Library for Roblox Executors
 
-A modern, modular UI Library built for Roblox executor scripts.  
-Uses the Linoria framework for a clean, responsive, and powerful interface.
+A clean, modular UI library based on **Linoria UI** — designed for Roblox executor scripts.  
+No credits are taken, all logic and styling are based on Linoria principles.
 
 ---
 
-## 📦 Setup
+## 📦 Installation
 
 ```lua
-local base = 'https://raw.githubusercontent.com/17kShotsss/UI-LIBRARY/main/'
+local repo = 'https://raw.githubusercontent.com/17kShotsss/UI-LIBRARY/main/'
 
-local Library = loadstring(game:HttpGet(base .. 'Library.lua'))()
-local ThemeManager = loadstring(game:HttpGet(base .. 'addons/ThemeManager.lua'))()
-local SaveManager = loadstring(game:HttpGet(base .. 'addons/SaveManager.lua'))()
+local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
-🪟 Creating the Window
+🪟 Create a Window
 
 local Window = Library:CreateWindow({
-    Title = 'My Script UI',
+    Title = 'Example | UI',
     Center = true,
     AutoShow = true,
 })
 
-🧱 Tabs & Groupboxes
+🗂️ Tabs & Groupboxes
 
 local Tabs = {
     Main = Window:AddTab('Main'),
-    ['UI Settings'] = Window:AddTab('UI Settings'),
+    Settings = Window:AddTab('Settings'),
 }
 
-local LeftGroupBox = Tabs.Main:AddLeftGroupbox('Main Controls')
+local LeftGroupBox = Tabs.Main:AddLeftGroupbox('Combat')
+local RightGroupBox = Tabs.Main:AddRightGroupbox('Visuals')
 
-🔘 Toggle
+🎛️ Controls
+✅ Toggles
 
-LeftGroupBox:AddToggle('MyToggle', {
-    Text = 'Enable Feature',
+LeftGroupBox:AddToggle('SilentAim', {
+    Text = 'Enable Silent Aim',
     Default = false,
-    Tooltip = 'Toggles something on or off',
-})
-
-Toggles.MyToggle:OnChanged(function()
-    print('Toggle:', Toggles.MyToggle.Value)
-end)
-
-📊 Slider
-
-LeftGroupBox:AddSlider('MySlider', {
-    Text = 'Adjust Value',
-    Default = 0,
-    Min = 0,
-    Max = 100,
-    Rounding = 0,
-})
-
-Options.MySlider:OnChanged(function()
-    print('Slider:', Options.MySlider.Value)
-end)
-
-📝 Textbox
-
-LeftGroupBox:AddInput('MyInput', {
-    Default = '',
-    Placeholder = 'Type here...',
-    Text = 'Textbox',
-    Tooltip = 'Enter text',
-})
-
-Options.MyInput:OnChanged(function()
-    print('Input:', Options.MyInput.Value)
-end)
-
-🔽 Dropdown
-
-LeftGroupBox:AddDropdown('MyDropdown', {
-    Values = { 'Option A', 'Option B', 'Option C' },
-    Default = 1,
-    Text = 'Choose one',
-})
-
-Options.MyDropdown:OnChanged(function()
-    print('Selected:', Options.MyDropdown.Value)
-end)
-
-✅ Multi-Select Dropdown
-
-LeftGroupBox:AddDropdown('MyMultiDropdown', {
-    Values = { 'One', 'Two', 'Three' },
-    Multi = true,
-    Default = 1,
-    Text = 'Multi Select',
-})
-
-Options.MyMultiDropdown:OnChanged(function()
-    for k, v in next, Options.MyMultiDropdown.Value do
-        print(k, v)
+    Tooltip = 'Automatically targets enemies',
+    Callback = function(v)
+        print('Silent Aim:', v)
     end
-end)
-
-🎨 Color Picker
-
-LeftGroupBox:AddLabel('Color'):AddColorPicker('MyColor', {
-    Default = Color3.fromRGB(0, 255, 0),
-    Title = 'Select Color',
 })
 
-Options.MyColor:OnChanged(function()
-    print('Color changed:', Options.MyColor.Value)
-end)
+🎚️ Sliders
 
-⌨️ Keybind Picker
-
-LeftGroupBox:AddLabel('Hotkey'):AddKeyPicker('MyKeybind', {
-    Default = 'F',
-    Mode = 'Toggle',
-    Text = 'Activate Something',
+LeftGroupBox:AddSlider('FOVRadius', {
+    Text = 'FOV Radius',
+    Default = 100,
+    Min = 10,
+    Max = 300,
+    Rounding = 0,
+    Compact = false,
+    Callback = function(v)
+        print('FOV set to', v)
+    end
 })
 
-Options.MyKeybind:OnClick(function()
-    print('Keybind activated')
-end)
+🎯 Keybinds
 
-🎛️ UI Settings Tab
-
-local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
-
-MenuGroup:AddButton('Unload UI', function()
-    Library:Unload()
-end)
-
-MenuGroup:AddLabel('Menu Key'):AddKeyPicker('MenuKeybind', {
-    Default = 'End',
-    NoUI = true,
-    Text = 'Toggle UI',
+RightGroupBox:AddLabel('Aimlock Key'):AddKeyPicker('AimKey', {
+    Default = 'C',
+    NoUI = false,
+    Text = 'Keybind'
 })
 
-Library.ToggleKeybind = Options.MenuKeybind
+🌈 Color Pickers
 
-🎭 ThemeManager
+RightGroupBox:AddToggle('UseCustomColor', {
+    Text = 'Enable Color',
+    Default = true,
+    Callback = function(v) end
+}):AddColorPicker('TargetColor', {
+    Default = Color3.fromRGB(255, 75, 75),
+    Title = 'Target Highlight Color'
+})
+
+🔽 Dropdowns
+
+LeftGroupBox:AddDropdown('ResolverMode', {
+    Values = { 'Off', 'Experimental', 'Full' },
+    Default = 1,
+    Multi = false,
+    Text = 'Resolver Mode',
+    Callback = function(mode)
+        print('Resolver:', mode)
+    end
+})
+
+⚙️ Theme & Config Saving
+
+Make sure to create a Settings tab before calling these:
 
 ThemeManager:SetLibrary(Library)
-ThemeManager:SetFolder('MyScriptThemes')
-ThemeManager:ApplyToTab(Tabs['UI Settings'])
-
-💾 SaveManager
-
 SaveManager:SetLibrary(Library)
-SaveManager:SetFolder('MyScriptConfigs')
-SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
+
 SaveManager:IgnoreThemeSettings()
-SaveManager:BuildConfigSection(Tabs['UI Settings'])
 
--- Optional auto-load:
--- SaveManager:LoadAutoloadConfig()
+ThemeManager:SetFolder('ExampleHub')
+SaveManager:SetFolder('ExampleHub/saves')
 
-🧼 Cleanup
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
 
-Library:OnUnload(function()
-    Library.Unloaded = true
-end)
-
-📁 Folder Structure
+📁 File Structure
 
 UI-LIBRARY/
-│
 ├── Library.lua
 └── addons/
     ├── ThemeManager.lua
     └── SaveManager.lua
 
-✅ Notes
+📝 Notes
 
-    This library is built on the Linoria UI framework.
+    The library is intended for use inside Roblox script executors.
 
-    All UI elements are fully customizable.
+    All UI logic is based on the Linoria UI framework.
 
-    SaveManager and ThemeManager are optional but recommended for configs/themes.
+    You can customize tab names, toggle defaults, and folders freely.
