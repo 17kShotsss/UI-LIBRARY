@@ -1,4 +1,4 @@
-local base = 'https://raw.githubusercontent.com/17kShotsss/UI-LIBRARY/main/' -- backup, not taking any credits
+local base = 'https://raw.githubusercontent.com/17kShotsss/UI-LIBRARY/main/'
 
 local Library = loadstring(game:HttpGet(base .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(base .. 'addons/ThemeManager.lua'))()
